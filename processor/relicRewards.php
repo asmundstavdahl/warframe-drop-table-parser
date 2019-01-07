@@ -5,6 +5,8 @@ function process_relicRewards($table, &$byItem, &$bySource)
     $sourceType = "Relic reward";
     $bySource[$sourceType] = [];
 
+    $source = [];
+
     foreach ($table->childNodes as $tr) {
         if ($tr->getAttribute("class") == "blank-row") {
             continue;
@@ -19,7 +21,6 @@ function process_relicRewards($table, &$byItem, &$bySource)
 
             $source = [$relicName, $relicQuality];
         } else {
-            # children are td
             $item = trim($tr->childNodes[0]->textContent);
             $dropRate = preg_replace("_[^.0-9]_", "", $tr->childNodes[1]->textContent);
             $dropChancePercent = floatval($dropRate);
@@ -36,10 +37,6 @@ function process_relicRewards($table, &$byItem, &$bySource)
 
             if (!array_key_exists($source[0], $bySource)) {
                 $bySource[$source[0]] = [];
-            }
-
-            if (!@$source[1]) {
-                echo "No \$source[1]. Source was:\n".print_r($source, true)."\nAnd the tr was:\n".print_r($tr, true)."\n\n";
             }
 
             $bySource[$sourceType][$source[0]][] = [

@@ -45,7 +45,7 @@ function process_missionRewards($table, &$byItem, &$bySource)
 
     $nextTrIsMainSource = true;
 
-    $source = ["?mission?"];
+    $source = [];
 
     foreach ($table->childNodes as $tr) {
         if ($tr->nodeName != "tr") {
@@ -66,11 +66,9 @@ function process_missionRewards($table, &$byItem, &$bySource)
                 $source[1] = $newSourceSpecifier;
             }
         } else {
-            # children are td
             $item = trim($tr->childNodes[0]->textContent);
             $dropRate = preg_replace("_[^.0-9]_", "", $tr->childNodes[1]->textContent);
             $dropChancePercent = floatval($dropRate);
-            #echo "{$item} @ " . implode(" : ", $source) . " is {$dropChancePercent}\n";
 
             if (!array_key_exists($item, $byItem)) {
                 $byItem[$item] = [];

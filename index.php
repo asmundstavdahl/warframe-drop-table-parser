@@ -24,36 +24,14 @@ $doc = new DOMDocument();
 $doc->loadHTML($b);
 
 
-
-function nl(){ echo "\n<br/>\n"; }
-
 /**
- * E.g.:
- * 
- * [ "Axi H4 Relic" => [
- *         [ "chance" => 6.25
- *         , "source" =>
- *             [ "Event: Uranus/Miranda (Defense)"
- *             , "Rotation B"
- *             ]
- *         ],
- *     ],
- * ]
+ * Drops...
  */
 $byItem = [];
-
-/**
- * E.g.:
- * 
- * [ "mission" => [
- *     "Event: Uranus/Miranda (Defense)" => [
- *         "Rotation B" => [
- *             "Axi H4 Relic" => 6.25 ]]]]
- */
 $bySource = [];
 
 /**
- * Each table is preceeded by an h3 tag describing its drop source:
+ * Each table in the HTML is preceeded by an h3 tag describing its drop source:
  *
  * [id=missionRewards] Missions
  * [id=relicRewards] Relics
@@ -79,31 +57,15 @@ foreach ($doc->getElementsByTagName("table") as $table) {
 
     $tableProcessorSourceFile = "processor/${tableHeadingId}.php";
 
-    @mkdir("processor");
-    @touch($tableProcessorSourceFile);
-    if(strlen(file_get_contents($tableProcessorSourceFile)) == 0){
-        file_put_contents($tableProcessorSourceFile, "<?php
-
-function process_{$tableHeadingId}(\$table, &\$byItem, &\$bySource)
-{
-    
-}\n");
-    }
-
     require $tableProcessorSourceFile;
 
     $tableProcessorFunction = "process_{$tableHeadingId}";
     $tableProcessorFunction($table, $byItem, $bySource);
-
-    #print_r($byItem);
-    #print_r($bySource);
-    #break;
-
-    #echo "\n\n<br>\n\n";
-    #break;
 }
 
-
+/**
+ * For debugging
+ */
 foreach ($bySource as $sourceType => $sources) {
     break;
     echo "# $sourceType\n";
