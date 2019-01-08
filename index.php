@@ -10,7 +10,7 @@ if(time() - 3600 > intval(@file_get_contents($cacheTimeFile))){
 
     $b = str_replace("</", "\n</", $b);
     $b = str_replace(" & ", " &quot; ", $b);
-    
+
     file_put_contents($cacheTimeFile, time());
     file_put_contents($cacheFile, $b);
     error_log("Re-cached drop table.");
@@ -18,7 +18,7 @@ if(time() - 3600 > intval(@file_get_contents($cacheTimeFile))){
     $b = file_get_contents($cacheFile);
 }
 
-echo "HTML is ".strlen($b)." bytes.\n\n\n\n";
+#echo "HTML is ".strlen($b)." bytes.\n\n\n\n";
 
 $doc = new DOMDocument();
 $doc->loadHTML($b);
@@ -29,6 +29,11 @@ $doc->loadHTML($b);
  */
 $byItem = [];
 $bySource = [];
+
+function makeItemMoreSearchable($item)
+{
+    return preg_replace('`^([\d,]+)\s+(.*)$`', '\2, \1', $item, 1);
+}
 
 /**
  * Each table in the HTML is preceeded by an h3 tag describing its drop source:
@@ -53,7 +58,7 @@ foreach ($doc->getElementsByTagName("table") as $table) {
     $tableHeadingText = $preceedingH3->nodeValue;
     $tableHeadingText = str_replace(":", "", $tableHeadingText);
     $tableHeadingId = $preceedingH3->attributes->getNamedItem("id")->value;
-    echo "[{$tableHeadingId}] {$tableHeadingText}";
+    #echo "[{$tableHeadingId}] {$tableHeadingText}";
 
     $tableProcessorSourceFile = "processor/${tableHeadingId}.php";
 
@@ -79,16 +84,52 @@ foreach ($bySource as $sourceType => $sources) {
 
 
 
+$jsonFlags = array_key_exists("pretty", $_GET) ?JSON_PRETTY_PRINT :0;
 
-echo json_encode($bySource, JSON_PRETTY_PRINT);
+#$jsonString = json_encode($bySource);#, JSON_PRETTY_PRINT);
+echo "Output:";
+echo "\n<br>\nby-item:   (bytes) ".file_put_contents("output/by-item.json", json_encode($byItem, $jsonFlags));
+echo "\n<br>\nby-source: (bytes) ".file_put_contents("output/by-source.json", json_encode($bySource, $jsonFlags));
 
-
-
-
-
-$thatTookUs = microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"];
-echo "\n\n\n\nThat took {$thatTookUs} seconds";
-
+exit;
 
 
-echo "\n\n\n\n<script>setTimeout('location.reload()', 1000)</script>";
+
+
+
+
+
+
+
+
+
+
+function render(string $templateName, array $environmentValues = [])
+{
+    extract($environmentValues);
+    ob_start();
+    $templateFile = __DIR__."/templates/{$templateName}.php";
+    if (!file_exists($templateFile)) {
+        touch($templateFile);
+    }
+    require $templateFile;
+    return ob_get_clean();
+}
+
+switch (@$_GET["browse"]) {
+    case "search":
+        # code...
+        break;
+
+    case "by-item":
+    default:
+        $contentString = render("by-item");
+        break;
+}
+
+echo render("main", [
+    "byItem" => $byItem,
+    "bySource" => $bySource,
+    "jsonString" => $jsonString,
+    "contentHTML" => $contentString,
+]);

@@ -22,6 +22,9 @@ function process_relicRewards($table, &$byItem, &$bySource)
             $source = [$relicName, $relicQuality];
         } else {
             $item = trim($tr->childNodes[0]->textContent);
+
+            $item = makeItemMoreSearchable($item);
+
             $dropRate = preg_replace("_[^.0-9]_", "", $tr->childNodes[1]->textContent);
             $dropChancePercent = floatval($dropRate);
 
