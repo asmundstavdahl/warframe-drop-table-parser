@@ -9,6 +9,7 @@ function process_relicRewards($table, &$byItem, &$bySource)
 
     foreach ($table->childNodes as $tr) {
         if ($tr->getAttribute("class") == "blank-row") {
+            $nextTrIsMainSource = true;
             continue;
         }
 
@@ -42,10 +43,11 @@ function process_relicRewards($table, &$byItem, &$bySource)
                 $bySource[$source[0]] = [];
             }
 
-            $bySource[$sourceType][$source[0]][] = [
+            $bySource[$source[0]][] = [
                 "specifically" => $source[1],
                 "item" => $item,
                 "dropRate" => $dropChancePercent,
+                "sourceType" => $sourceType,
             ];
         }
     }

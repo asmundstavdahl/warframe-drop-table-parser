@@ -41,10 +41,10 @@ DOMNode replaceChild ( DOMNode $newnode , DOMNode $oldnode )
 function process_modByAvatar($table, &$byItem, &$bySource)
 {
     $sourceType = "Enemy drop";
-    $bySource[$sourceType] = [];
 
     foreach ($table->childNodes as $tr) {
         if ($tr->getAttribute("class") == "blank-row") {
+            $nextTrIsMainSource = true;
             continue;
         }
 
@@ -80,10 +80,11 @@ function process_modByAvatar($table, &$byItem, &$bySource)
                 echo "No \$source[1]. Source was:\n".print_r($source, true)."\nAnd the tr was:\n".print_r($tr, true)."\n\n";
             }
 
-            $bySource[$sourceType][$source[0]][] = [
+            $bySource[$source[0]][] = [
                 "specifically" => $source[1],
                 "item" => $item,
                 "dropRate" => $dropChancePercent,
+                "sourceType" => $sourceType,
             ];
         }
     }

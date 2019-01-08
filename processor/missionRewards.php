@@ -41,7 +41,6 @@ DOMNode replaceChild ( DOMNode $newnode , DOMNode $oldnode )
 function process_missionRewards($table, &$byItem, &$bySource)
 {
     $sourceType = "Mission reward";
-    $bySource[$sourceType] = [];
 
     $nextTrIsMainSource = true;
 
@@ -53,6 +52,7 @@ function process_missionRewards($table, &$byItem, &$bySource)
         }
 
         if ($tr->getAttribute("class") == "blank-row") {
+            $nextTrIsMainSource = true;
             continue;
         }
 
@@ -65,6 +65,7 @@ function process_missionRewards($table, &$byItem, &$bySource)
                 $newSourceSpecifier = trim($tr->childNodes[0]->textContent);
                 $source[1] = $newSourceSpecifier;
             }
+            echo "th: ".$tr->textContent."<br>\n";
         } else {
             $item = trim($tr->childNodes[0]->textContent);
 
@@ -87,11 +88,17 @@ function process_missionRewards($table, &$byItem, &$bySource)
                 $bySource[$source[0]] = [];
             }
 
-            $bySource[$sourceType][$source[0]][] = [
-                "specifically" => $source[1],
+            $entry = [
                 "item" => $item,
                 "dropRate" => $dropChancePercent,
+                "sourceType" => $sourceType,
             ];
+
+            if (@$source[1]) {
+                $entry["specifically"] = $source[1];
+            }
+
+            $bySource[$source[0]][] = $entry;
         }
     }
 }

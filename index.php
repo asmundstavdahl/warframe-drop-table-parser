@@ -32,7 +32,7 @@ $bySource = [];
 
 function makeItemMoreSearchable($item)
 {
-    return preg_replace('`^([\d,]+)\s+(.*)$`', '\2, \1', $item, 1);
+    return $item;#preg_replace('`^([\d,]+)\s+(.*)$`', '\2, \1', $item, 1);
 }
 
 /**
@@ -90,7 +90,8 @@ $jsonFlags = array_key_exists("pretty", $_GET) ?JSON_PRETTY_PRINT :0;
 echo "Output:";
 echo "\n<br>\nby-item:   (bytes) ".file_put_contents("output/by-item.json", json_encode($byItem, $jsonFlags));
 echo "\n<br>\nby-source: (bytes) ".file_put_contents("output/by-source.json", json_encode($bySource, $jsonFlags));
-
+echo "\n<br>";
+echo "\n<br>\n<pre>".print_r(array_keys($bySource), true)."</pre>";
 exit;
 
 
